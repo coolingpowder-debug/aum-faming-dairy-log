@@ -53,10 +53,11 @@ menu = st.sidebar.selectbox(
     ]
 )
 
-# 📌 เพิ่มเครดิตด้านล่าง Sidebar (ตัวหนังสือไม่ใหญ่)
+# 📌 เพิ่มรูปภาพการ์ดและเครดิตด้านล่าง Sidebar (ขนาดพอดี ไม่ใหญ่เกินไป)
 st.sidebar.markdown("---")
+st.sidebar.image("https://i.ibb.co/3yk5075/indy-card.jpg", width=220)
 st.sidebar.markdown(
-    "<p style='text-align: center; color: gray; font-size: 11px;'>ออกแบบและพัฒนาโดย พ่ออินดี้</p>", 
+    "<p style='text-align: center; color: gray; font-size: 11px; margin-top: 5px;'>ออกแบบและพัฒนาโดย พ่ออินดี้</p>", 
     unsafe_allow_html=True
 )
 
