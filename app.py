@@ -40,7 +40,7 @@ menu = st.sidebar.selectbox(
         "📋 1. บันทึกรายวัน (Daily Log)",
         "💧 2. ติดตามคุณภาพน้ำ (pH / DO)",
         "🦐 3. บันทึกการสุ่มยอและโต (Sampling)",
-        "💰 4. บันทึกต้นทุนราย Crop",
+        "💰 4. บันทึกต้นทุนและวางแผนรอบ Crop",
         "📊 5. สรุปผลผลิตและกำไร (แยกรายบ่อ)"
     ]
 )
@@ -172,11 +172,33 @@ elif menu == "🦐 3. บันทึกการสุ่มยอและโ�
     st.dataframe(sample_growth, use_container_width=True)
 
 # ---------------------------------------------------------
-# เมนูที่ 4: บันทึกต้นทุนราย Crop
+# เมนูที่ 4: บันทึกต้นทุนและวางแผนรอบ Crop (อัปเดตใหม่)
 # ---------------------------------------------------------
-elif menu == "💰 4. บันทึกต้นทุนราย Crop":
-    st.header(f"💰 บันทึกต้นทุนประจำรอบการเลี้ยง — [ กำลังจัดการ: {selected_pond} ]")
+elif menu == "💰 4. บันทึกต้นทุนและวางแผนรอบ Crop":
+    st.header(f"💰 บันทึกต้นทุนและวางแผนรอบการเลี้ยง — [ กำลังจัดการ: {selected_pond} ]")
     
+    with st.expander("📅 กำหนดข้อมูลตั้งต้นรอบการเลี้ยง (Crop Setup & AI Estimation)", expanded=True):
+        with st.form("crop_setup_form"):
+            col_s1, col_s2, col_s3 = st.columns(3)
+            with col_s1:
+                crop_name = st.selectbox("รอบการเลี้ยง (Crop)", ["Crop 1/2026", "Crop 2/2026"])
+            with col_s2:
+                shrimp_type = st.selectbox("🦐 ชนิดกุ้ง", ["กุ้งขาวแวนนาไม", "กุ้งก้ามกราม"])
+            with col_s3:
+                start_date = st.date_input("📅 วันที่ลงเลี้ยง (ปล่อยลูกกุ้ง)", datetime.date.today())
+                
+            # AI คำนวณวันจับกุมจากชนิดกุ้ง (กุ้งขาว ~120 วัน, กุ้งก้ามกราม ~180 วัน)
+            days_to_grow = 120 if shrimp_type == "กุ้งขาวแวนนาไม" else 180
+            estimated_harvest_date = start_date + datetime.timedelta(days=days_to_grow)
+            
+            st.info(f"🤖 **AI แนะนำ (ประมาณการ):** สำหรับ **{shrimp_type}** จะใช้ระยะเวลาเลี้ยงประมาณ **{days_to_grow} วัน** | วันที่คาดว่าจะจับผลผลิต: **{estimated_harvest_date.strftime('%d/%m/%Y')}**")
+            
+            setup_submitted = st.form_submit_button("บันทึกข้อมูลตั้งต้นรอบ Crop")
+            if setup_submitted:
+                st.success(f"บันทึกตั้งค่ารอบ {crop_name} ({shrimp_type}) สำเร็จ!")
+
+    st.divider()
+    st.subheader("💸 บันทึกรายการค่าใช้จ่ายตามหมวดหมู่ต้นทุน")
     category = st.selectbox(
         "หมวดหมู่ต้นทุน",
         [
@@ -194,8 +216,7 @@ elif menu == "💰 4. บันทึกต้นทุนราย Crop":
             item_detail = st.text_input("รายการรายละเอียด (เช่น ค่าลูกกุ้ง, ค่าอาหารเบอร์ 1)")
             amount = st.number_input("จำนวนเงิน (บาท)", min_value=0.0, format="%.2f")
         with col2:
-            crop_name = st.selectbox("รอบการเลี้ยง (Crop)", ["Crop 1/2026", "Crop 2/2026"])
-            remark = st.text_input("หมายเหตุ")
+            remark = st.text_input("หมายเหตุเพิ่มเติม")
             
         cost_submitted = st.form_submit_button(f"เพิ่มรายการต้นทุนเข้า {selected_pond}")
         if cost_submitted:
@@ -238,7 +259,7 @@ elif menu == "📊 5. สรุปผลผลิตและกำไร (แ�
     
     st.subheader(f"📋 รายละเอียดการจับขายประจำ {selected_pond}")
     harvest_df = pd.DataFrame({
-        "หัวข้อ": ["รอบการเลี้ยง", "น้ำหนักเฉลี่ยตอนจับ", "เปอร์เซ็นต์รอดจริง", "ราคาขายเฉลี่ย"],
-        "รายละเอียด": ["Crop 1/2026", "14.2 กรัม", "84.5%", "180 บาท/กก."]
+        "หัวข้อ": ["รอบการเลี้ยง", "ชนิดกุ้ง", "น้ำหนักเฉลี่ยตอนจับ", "เปอร์เซ็นต์รอดจริง", "ราคาขายเฉลี่ย"],
+        "รายละเอียด": ["Crop 1/2026", "กุ้งขาวแวนนาไม", "14.2 กรัม", "84.5%", "180 บาท/กก."]
     })
     st.table(harvest_df)
