@@ -2,13 +2,13 @@ import streamlit as st
 import pandas as pd
 import datetime
 
-st.set_page_config(page_title="ระบบบันทึกข้อมูลฟาร์มกุ้งหลายบ่อ", page_icon="🦐", layout="wide")
+st.set_page_config(page_title="ระบบบันทึกข้อมูลฟาร์มกุ้งอัจฉริยะ", page_icon="🦐", layout="wide")
 
 # ส่วนหัวด้านบน: แสดงนาฬิกา พยากรณ์อากาศ และข้อมูลน้ำขึ้น-ลงรายวัน
 top_col1, top_col2 = st.columns([2.3, 1.7])
 
 with top_col1:
-    st.title("🦐 ระบบบันทึกข้อมูลฟาร์มกุ้ง (Multi-Pond Management)")
+    st.title("🦐 ระบบบันทึกข้อมูลฟาร์มกุ้ง (Pro Multi-Pond Management)")
 
 with top_col2:
     current_time = datetime.datetime.now().strftime("%H:%M:%S")
@@ -29,7 +29,7 @@ with top_col2:
 
 st.divider()
 
-# --- จัดการเก็บรายชื่อบ่อและสต็อกอาหารใน Session State ---
+# --- Session States ---
 if 'ponds_list' not in st.session_state:
     st.session_state['ponds_list'] = ["บ่อที่ 01", "บ่อที่ 02", "บ่อที่ 03"]
 
@@ -41,28 +41,28 @@ if 'feed_stock_log' not in st.session_state:
         "วันที่", "ร้านที่ซื้อ", "เบอร์อาหาร", "จำนวนรับเข้า (กระสอบ/ถุง)", "มูลค่า (บาท)", "จ่ายออก (กระสอบ/ถุง)"
     ])
 
-# 📌 แถบเลือกบ่อหลัก (Global Pond Selector) ด้านบน Sidebar
+# 📌 Sidebar Global Selector & Menu
 st.sidebar.markdown("### 🔍 เลือกบ่อที่ต้องการทำงาน")
 selected_pond = st.sidebar.selectbox("เลือกบ่อ", st.session_state['ponds_list'])
 
 st.sidebar.divider()
 
-# เมนูด้านข้างเพิ่มเมนูสต็อกอาหาร
 menu = st.sidebar.selectbox(
     "เลือกเมนูหลัก",
     [
         "📈 0. แดชบอร์ดภาพรวมทุกบ่อ (Dashboard)",
         "🏷️ 1. ตั้งชื่อและจัดการบ่อเลี้ยง",
         "📦 2. สต็อกอาหาร (Feed Stock)",
-        "📋 3. บันทึกรายวัน (Daily Log)",
-        "💧 4. ติดตามคุณภาพน้ำ (pH / DO)",
-        "🦐 5. บันทึกการสุ่มยอและโต (Sampling)",
+        "📋 3. บันทึกรายวัน (Daily Log & Metrics)",
+        "💧 4. ติดตามคุณภาพน้ำ & แจ้งเตือน",
+        "🦐 5. บันทึกการสุ่มยอและรูปภาพบ่อ",
         "💰 6. บันทึกต้นทุนและวางแผนรอบ Crop",
-        "📊 7. สรุปผลผลิตและกำไร (แยกรายบ่อ)"
+        "📚 7. คลังความรู้และคู่มือคำนวณ",
+        "📊 8. สรุปผลผลิตและส่งออกรายงาน"
     ]
 )
 
-# 📌 เพิ่มรูปภาพการ์ดและเครดิตด้านล่าง Sidebar (ขนาดใหญ่ขึ้นตามต้องการ)
+# 📌 Sidebar Footer Card & Credit
 st.sidebar.markdown("---")
 st.sidebar.image("https://i.ibb.co/3yk5075/indy-card.jpg", width=250)
 st.sidebar.markdown(
@@ -81,7 +81,7 @@ if "0." in menu:
     with kpi1:
         st.metric(label="🏊‍♂️ จำนวนบ่อทั้งหมด", value="3 บ่อ", delta="ปกติ")
     with kpi2:
-        st.metric(label="🦐 ผลผลิตคาดการณ์รวม", value="10,500 กก.", delta="+5% จากรอบก่อน")
+        st.metric(label="🦐 ผลผลิตคาดการณ์รวม (Biomass)", value="10,500 กก.", delta="+5% จากรอบก่อน")
     with kpi3:
         st.metric(label="💰 ต้นทุนรวมทุกบ่อ", value="564,000 บาท", delta="-2% ประหยัดขึ้น")
     with kpi4:
@@ -89,14 +89,15 @@ if "0." in menu:
 
     st.divider()
 
-    st.subheader("📋 [ตัวอย่างการแสดงผล] ตารางสรุปสถานะรายบ่อเปรียบเทียบ")
+    st.subheader("📋 [ตัวอย่างการแสดงผล] ตารางสรุปสถานะรายบ่อเปรียบเทียบ (FCR & Biomass)")
     overview_df = pd.DataFrame({
         "ชื่อบ่อ": ["บ่อที่ 01", "บ่อที่ 02", "บ่อที่ 03"],
         "ชนิดกุ้ง": ["กุ้งขาวแวนนาไม", "กุ้งขาวแวนนาไม", "กุ้งก้ามกราม"],
         "อายุ (DOC)": [45, 30, 60],
-        "อัตรารอดคาดการณ์ (%)": ["88%", "92%", "85%"],
-        "ต้นทุนปัจจุบัน (บาท)": [188000, 160000, 216000],
-        "สถานะบ่อ": ["ปกติ", "ปกติ", "เฝ้าระวัง pH"]
+        "FCR เฉลี่ย": [1.25, 1.18, 1.42],
+        "Biomass (กก.)": [3200, 2800, 4500],
+        "อัตรารอด (%)": ["88%", "92%", "85%"],
+        "สถานะระบบ": ["🟢 ปกติ", "🟢 ปกติ", "🟡 เฝ้าระวัง pH"]
     })
     st.dataframe(overview_df, use_container_width=True)
 
@@ -126,7 +127,7 @@ elif "1." in menu:
         st.dataframe(pond_df, use_container_width=True)
 
 # ---------------------------------------------------------
-# เมนูที่ 2: สต็อกอาหาร (Feed Stock) - เพิ่มใหม่ตามสั่ง
+# เมนูที่ 2: สต็อกอาหาร (Feed Stock)
 # ---------------------------------------------------------
 elif "2." in menu:
     st.header("📦 ระบบจัดการสต็อกอาหารกุ้ง")
@@ -150,7 +151,7 @@ elif "2." in menu:
         st.subheader("📥 บันทึกรับเข้าอาหาร (ซื้ออาหารเข้าฟาร์ม)")
         with st.form("feed_in_form"):
             f_date = st.date_input("วันที่ซื้อ / รับเข้า", datetime.date.today())
-            f_store = st.text_input("ร้านที่ซื้อ (เช่น ร้านสหกรณ์การเกษตร, เจริญโภคภัณฑ์)")
+            f_store = st.text_input("ร้านที่ซื้อ (เช่น ร้านสหกรณ์การเกษตร, ซีพี)")
             f_type = st.selectbox("เลือกเบอร์อาหาร", st.session_state['feed_types'])
             f_qty = st.number_input("จำนวนที่รับเข้า (กระสอบ / ถุง)", min_value=0.0, format="%.2f", value=10.0)
             f_cost = st.number_input("ค่าอาหารรวมทั้งหมด (บาท)", min_value=0.0, format="%.2f", value=5000.0)
@@ -196,22 +197,17 @@ elif "2." in menu:
         st.subheader("📊 ตารางสรุปสต็อกอาหารคงเหลือแต่ละเบอร์")
         if not st.session_state['feed_stock_log'].empty:
             df = st.session_state['feed_stock_log']
-            # คำนวณหายอดคงเหลือแยกตามเบอร์อาหาร
             summary_stock = df.groupby("เบอร์อาหาร")[["จำนวนรับเข้า (กระสอบ/ถุง)", "จ่ายออก (กระสอบ/ถุง)"]].sum()
             summary_stock["คงเหลือ (กระสอบ/ถุง)"] = summary_stock["จำนวนรับเข้า (กระสอบ/ถุง)"] - summary_stock["จ่ายออก (กระสอบ/ถุง)"]
             st.dataframe(summary_stock.reset_index(), use_container_width=True)
-            
-            st.divider()
-            st.subheader("📋 ประวัติการเคลื่อนไหวสต็อกอาหารทั้งหมด")
-            st.dataframe(df, use_container_width=True)
         else:
             st.info("ยังไม่มีข้อมูลในระบบสต็อกอาหาร")
 
 # ---------------------------------------------------------
-# เมนูที่ 3: บันทึกรายวัน (Daily Log)
+# เมนูที่ 3: บันทึกรายวัน (Daily Log & Metrics)
 # ---------------------------------------------------------
 elif "3." in menu:
-    st.header(f"📋 บันทึกข้อมูลการเลี้ยงกุ้งรายวัน — [ กำลังจัดการ: {selected_pond} ]")
+    st.header(f"📋 บันทึกข้อมูลการเลี้ยงกุ้งรายวัน & คำนวณ FCR — [ กำลังจัดการ: {selected_pond} ]")
     
     with st.form("daily_log_form"):
         st.subheader("📝 กรอกข้อมูลประจำวัน")
@@ -221,10 +217,10 @@ elif "3." in menu:
             log_date = st.date_input("วันที่", datetime.date.today())
             doc = st.number_input("อายุการเลี้ยง (DOC)", min_value=0, value=1)
             feed_no = st.selectbox("เบอร์อาหาร", st.session_state['feed_types'])
-            feed_amt = st.number_input("ปริมาณอาหารที่ให้ (กก.)", min_value=0.0, format="%.2f")
+            feed_amt = st.number_input("ปริมาณอาหารที่ให้วันนี้ (กก.)", min_value=0.0, format="%.2f")
             
         with col2:
-            dead_shrimp = st.number_input("จำนวนกุ้งตาย (ตัว)", min_value=0, value=0)
+            dead_shrimp = st.number_input("จำนวนกุ้งตายวันนี้ (ตัว)", min_value=0, value=0)
             aerator_hrs = st.number_input("ชั่วโมงเปิดเครื่องตีน้ำ", min_value=0.0, value=24.0, format="%.1f")
             chemical = st.text_input("สารเคมี / จุลินทรีย์ที่ใส่")
             
@@ -237,79 +233,98 @@ elif "3." in menu:
             st.success(f"บันทึกข้อมูลของ {selected_pond} วันที่ {log_date} (DOC {doc}) สำเร็จเรียบร้อย!")
 
     st.divider()
-    st.subheader(f"📊 [ตัวอย่างการแสดงผล] ตารางประวัติบันทึกรายวันของ {selected_pond}")
+    st.subheader(f"📊 [ตัวอย่างการแสดงผล] ตารางประวัติและค่าคำนวณ FCR อัตโนมัติของ {selected_pond}")
     sample_daily = pd.DataFrame({
         "บ่อ": [selected_pond, selected_pond],
         "วันที่": ["2026-06-01", "2026-06-02"],
         "DOC": [1, 2],
-        "เบอร์อาหาร": [st.session_state['feed_types'][0], st.session_state['feed_types'][0]],
-        "อาหาร (กก.)": [10.5, 12.0],
-        "กุ้งตาย (ตัว)": [2, 1]
+        "อาหารสะสม (กก.)": [10.5, 22.5],
+        "กุ้งตาย (ตัว)": [2, 1],
+        "FCR ประเมิน": [1.15, 1.18]
     })
     st.dataframe(sample_daily, use_container_width=True)
 
 # ---------------------------------------------------------
-# เมนูที่ 4: ติดตามคุณภาพน้ำ (pH / DO)
+# เมนูที่ 4: ติดตามคุณภาพน้ำ & แจ้งเตือน (Explainable Alerts)
 # ---------------------------------------------------------
 elif "4." in menu:
-    st.header(f"💧 บันทึกและวิเคราะห์คุณภาพน้ำ — [ กำลังจัดการ: {selected_pond} ]")
+    st.header(f"💧 บันทึกและวิเคราะห์คุณภาพน้ำอัจฉริยะ — [ กำลังจัดการ: {selected_pond} ]")
     
     with st.form("water_form"):
         col1, col2 = st.columns(2)
         with col1:
             w_date = st.date_input("วันที่ตรวจน้ำ", datetime.date.today())
-            ph_morning = st.number_input("ค่า pH (เช้า)", value=7.5, format="%.1f")
-            ph_evening = st.number_input("ค่า pH (เย็น)", value=8.0, format="%.1f")
-            do_morning = st.number_input("ค่า DO เช้า (mg/l)", value=5.5, format="%.1f")
+            ph_val = st.number_input("ค่า pH ปัจจุบัน", value=7.8, format="%.1f")
+            do_val = st.number_input("ค่าออกซิเจนละลาย DO (mg/l)", value=5.2, format="%.1f")
         with col2:
-            do_night = st.number_input("ค่า DO ดึก (mg/l)", value=5.0, format="%.1f")
             temp = st.number_input("อุณหภูมิ (°C)", value=28.0, format="%.1f")
             salinity = st.number_input("ความเค็ม (ppt)", value=15.0, format="%.1f")
             water_remark = st.text_input("หมายเหตุสภาพน้ำ")
             
-        w_submitted = st.form_submit_button(f"💾 บันทึกค่าคุณภาพน้ำสำหรับ {selected_pond}")
+        w_submitted = st.form_submit_button(f"💾 ตรวจสอบและบันทึกค่าคุณภาพน้ำ")
         if w_submitted:
-            st.success(f"บันทึกข้อมูลคุณภาพน้ำของ {selected_pond} สำเร็จ!")
+            # Explainable Alerts Logic
+            alerts = []
+            if ph_val < 7.5 or ph_val > 8.5:
+                alerts.append(f"⚠️ เตือน: ค่า pH ({ph_val}) อยู่นอกช่วงที่เหมาะสม (7.5 - 8.5)")
+            if do_val < 4.0:
+                alerts.append(f"🚨 เตือนวิกฤต: ค่า DO ต่ำเกินไป ({do_val} mg/l) กุ้งเสี่ยงน็อคน้ำ!")
+                
+            if alerts:
+                for alt in alerts:
+                    st.error(alt)
+            else:
+                st.success(f"✅ คุณภาพน้ำของ {selected_pond} ปกติอยู่ในเกณฑ์มาตรฐานปลอดภัย!")
 
     st.divider()
     st.subheader(f"📈 [ตัวอย่างการแสดงผล] กราฟแสดงแนวโน้มคุณภาพน้ำย้อนหลังของ {selected_pond}")
     water_data = pd.DataFrame({
         "DOC": [1, 2, 3, 4, 5],
-        "pH เช้า": [7.5, 7.6, 7.4, 7.5, 7.6],
-        "pH เย็น": [8.0, 8.2, 7.9, 8.1, 8.0]
+        "pH": [7.5, 7.6, 7.4, 7.5, 7.6],
+        "DO (mg/l)": [5.5, 5.2, 5.8, 5.4, 5.6]
     }).set_index("DOC")
     st.line_chart(water_data)
 
 # ---------------------------------------------------------
-# เมนูที่ 5: บันทึกการสุ่มยอและโต (Sampling)
+# เมนูที่ 5: บันทึกการสุ่มยอและรูปภาพบ่อ (Sampling & Photo Log)
 # ---------------------------------------------------------
 elif "5." in menu:
-    st.header(f"🦐 บันทึกผลการสุ่มยอและน้ำหนัก (ABW) — [ กำลังจัดการ: {selected_pond} ]")
+    st.header(f"🦐 บันทึกผลการสุ่มยอและคลังรูปภาพบ่อ — [ กำลังจัดการ: {selected_pond} ]")
     
-    with st.form("sample_form"):
-        col1, col2 = st.columns(2)
-        with col1:
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        with st.form("sample_form"):
+            st.subheader("📊 บันทึกน้ำหนัก (ABW)")
             s_doc = st.number_input("อายุการเลี้ยง (DOC) ที่สุ่ม", min_value=1, value=30)
-            abw = st.number_input("น้ำหนักเฉลี่ยต่อตัว (กรัม - ABW)", min_value=0.0, format="%.2f")
-        with col2:
-            check_result = st.text_input("ผลการเช็กยอ / การกินอาหาร")
-            est_survival = st.slider("ประเมินอัตรารอด (%) คาดการณ์", 0, 100, 85)
+            abw = st.number_input("น้ำหนักเฉลี่ยต่อตัว (กรัม - ABW)", min_value=0.0, format="%.2f", value=4.5)
+            est_survival = st.slider("ประเมินอัตรารอด (%) คาดการณ์", 0, 100, 88)
             
-        s_submitted = st.form_submit_button(f"💾 บันทึกผลสุ่มยอสำหรับ {selected_pond}")
-        if s_submitted:
-            st.success(f"บันทึกสำเร็จสำหรับ {selected_pond} (DOC {s_doc} | ABW: {abw} กรัม)")
+            s_submitted = st.form_submit_button("บันทึกผลสุ่มยอ")
+            if s_submitted:
+                st.success(f"บันทึกผลสุ่มยอ {selected_pond} สำเร็จ!")
+
+    with col_p2:
+        st.subheader("📷 อัปโหลดรูปภาพบ่อ / สภาพกุ้งรายวัน")
+        uploaded_file = st.file_uploader("เลือกรูปภาพ (PNG, JPG)", type=["png", "jpg", "jpeg"])
+        if uploaded_file is not None:
+            st.image(uploaded_file, caption=f"ภาพบันทึกประจำบ่อ: {selected_pond}", use_container_width=True)
+            st.success("อัปโหลดและบันทึกรูปภาพลงระบบเรียบร้อย!")
+        else:
+            st.info("💡 [ตัวอย่างการแสดงผล] ยังไม่มีการอัปโหลดภาพใหม่ ระบบแสดงภาพตัวอย่างประจำบ่อ")
+            st.image("https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400", caption="ตัวอย่างสภาพน้ำและบ่อกุ้ง", width=300)
 
     st.divider()
-    st.subheader(f"📊 [ตัวอย่างการแสดงผล] ตารางประวัติการเจริญเติบโตของ {selected_pond}")
+    st.subheader(f"📋 [ตัวอย่างการแสดงผล] ตารางประวัติการเจริญเติบโต (ABW & Biomass) ของ {selected_pond}")
     sample_growth = pd.DataFrame({
         "DOC": [30, 45, 60],
         "น้ำหนักเฉลี่ย (ABW g.)": [3.5, 7.2, 12.5],
+        "Biomass ประเมิน (กก.)": [1400, 2700, 4200],
         "อัตรารอด (%)": [90, 88, 85]
     })
     st.dataframe(sample_growth, use_container_width=True)
 
 # ---------------------------------------------------------
-# เมนูที่ 6: บันทึกต้นทุนและวางแผนรอบ Crop (Interactive)
+# เมนูที่ 6: บันทึกต้นทุนและวางแผนรอบ Crop
 # ---------------------------------------------------------
 elif "6." in menu:
     st.header(f"💰 บันทึกต้นทุนและวางแผนรอบการเลี้ยง — [ กำลังจัดการ: {selected_pond} ]")
@@ -380,10 +395,37 @@ elif "6." in menu:
     st.metric(label=f"💸 ต้นทุนรวมทั้งสิ้นของ {selected_pond}", value=f"{total_cost:,.2f} บาท")
 
 # ---------------------------------------------------------
-# เมนูที่ 7: สรุปผลผลิตและกำไร (แยกรายบ่อ)
+# เมนูที่ 7: คลังความรู้และคู่มือคำนวณ (Knowledge Cards)
 # ---------------------------------------------------------
 elif "7." in menu:
-    st.header(f"📊 สรุปผลผลิตและกำไรสุทธิ — [ กำลังวิเคราะห์: {selected_pond} ]")
+    st.header("📚 คลังความรู้และสูตรคำนวณมาตรฐานการเลี้ยงกุ้ง")
+    st.info("💡 รวบรวมสูตรคำนวณและเกร็ดความรู้สำคัญในการจัดการฟาร์มกุ้งมืออาชีพ")
+
+    st.subheader("📖 1. สูตรการคำนวณที่สำคัญ (Deterministic Metrics)")
+    st.markdown("""
+    - **FCR (Feed Conversion Ratio / อัตราแลกเนื้อ):**  
+      $$\\text{FCR} = \\frac{\\text{น้ำหนักอาหารรวมที่ให้ทั้งหมด (กก.)}}{\\text{น้ำหนักกุ้งที่เพิ่มขึ้นรวม (กก.)}}$$  
+      *(ค่ามาตรฐานที่ดีควรอยู่ระหว่าง 1.1 - 1.4)*
+    
+    - **Biomass (มวลชีวะน้ำหนักกุ้งรวม):**  
+      $$\\text{Biomass} = \\text{จำนวนกุ้งที่เหลือรอด (ตัว)} \\times \\text{น้ำหนักเฉลี่ย (ABW กรัม)} \\div 1,000$$
+    
+    - **Survival Rate (อัตรารอด %):**  
+      $$\\text{SR} = \\left( \\frac{\\text{จำนวนกุ้งที่จับได้จริง}}{\\text{จำนวนลูกกุ้งที่ปล่อยลงเลี้ยง}} \\right) \\times 100$$
+    """)
+
+    st.divider()
+    st.subheader("🌊 2. แนวทางจัดการคุณภาพน้ำเบื้องต้น")
+    st.markdown("""
+    - **ค่า pH (ความเป็นกรด-ด่าง):** เหมาะสมที่สุดช่วงเช้า 7.5 - 7.8 และเย็น 8.0 - 8.4 หากแกว่งเกิน 0.5 ต่อวัน ให้ตรวจสอบการใส่ปูนหรือจุลินทรีย์
+    - **ค่า DO (ออกซิเจนละลาย):** ไม่ควรต่ำกว่า 4.0 mg/l ตลอด 24 ชั่วโมง หากต่ำกว่าต้องเร่งเปิดเครื่องตีน้ำเพิ่มเติมทันที
+    """)
+
+# ---------------------------------------------------------
+# เมนูที่ 8: สรุปผลผลิตและส่งออกรายงาน (Export & Harvest)
+# ---------------------------------------------------------
+elif "8." in menu:
+    st.header(f"📊 สรุปผลผลิต กำไรสุทธิ และส่งออกรายงาน — [ กำลังวิเคราะห์: {selected_pond} ]")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -395,11 +437,22 @@ elif "7." in menu:
         
     st.divider()
     net_profit = 630000 - 188000
-    st.success(f"### 🎉 กำไรสุทธิของ {selected_pond}: {net_profit:,.2f} บาท")
+    st.success(f"### 🎉 กำไรสุทธิของ {selected_pond}: {net_profit:,.2f} บาท (FCR: 1.22)")
     
     st.subheader(f"📋 [ตัวอย่างการแสดงผล] รายละเอียดการจับขายประจำ {selected_pond}")
     harvest_df = pd.DataFrame({
         "หัวข้อ": ["รอบการเลี้ยง", "ชนิดกุ้ง", "น้ำหนักเฉลี่ยตอนจับ", "เปอร์เซ็นต์รอดจริง", "ราคาขายเฉลี่ย"],
         "รายละเอียด": ["Crop 1/2026", "กุ้งขาวแวนนาไม", "14.2 กรัม", "84.5%", "180 บาท/กก."]
     })
-    st.table(harvest_df)
+    st.dataframe(harvest_df, use_container_width=True)
+
+    st.divider()
+    st.subheader("📥 ดาวน์โหลดและส่งออกรายงานข้อมูลฟาร์ม")
+    if st.button("📥 ดาวน์โหลดรายงานสรุปเป็นไฟล์ CSV"):
+        csv_data = harvest_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="คลิกเพื่อบันทึกไฟล์ CSV ลงเครื่อง",
+            data=csv_data,
+            file_name=f"farm_report_{selected_pond}.csv",
+            mime="text/csv"
+        )
