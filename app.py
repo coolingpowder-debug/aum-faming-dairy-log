@@ -1,21 +1,25 @@
 import streamlit as st
 import pandas as pd
 import datetime
+import pytz
 
 st.set_page_config(page_title="ระบบบันทึกข้อมูลฟาร์มกุ้งอัจฉริยะ", page_icon="🦐", layout="wide")
 
-# ส่วนหัวด้านบน: แสดงนาฬิกา พยากรณ์อากาศ และข้อมูลน้ำขึ้น-ลงรายวัน
+# กำหนด Timezone ประเทศไทย
+thai_tz = pytz.timezone("Asia/Bangkok")
+current_time_thai = datetime.datetime.now(thai_tz).strftime("%H:%M:%S")
+current_date_str = datetime.datetime.now(thai_tz).strftime("%d/%m/%Y")
+
+# ส่วนหัวด้านบน: แสดงนาฬิกาตามเวลาประเทศไทย พยากรณ์อากาศ และข้อมูลน้ำขึ้น-ลงรายวัน
 top_col1, top_col2 = st.columns([2.3, 1.7])
 
 with top_col1:
     st.title("🦐 ระบบบันทึกข้อมูลฟาร์มกุ้ง (Pro Multi-Pond Management)")
 
 with top_col2:
-    current_time = datetime.datetime.now().strftime("%H:%M:%S")
-    current_date_str = datetime.date.today().strftime("%d/%m/%Y")
     st.markdown(f"""
     <div style="text-align: right; background-color: #f0f2f6; padding: 10px; border-radius: 10px;">
-        <span style="font-size: 14px; font-weight: bold;">⏰ เวลา: {current_time}</span><br>
+        <span style="font-size: 14px; font-weight: bold;">⏰ เวลา (ไทย): {current_time_thai}</span><br>
         <span style="font-size: 12px; color: #555;">🌤️ พยากรณ์อากาศ (3 วัน):</span><br>
         <span style="font-size: 11px; color: #333;">วันนี้: 32°C ฝนฟ้าคะนอง | พรุ่งนี้: 33°C แดดจัด</span><hr style="margin: 5px 0;">
         <span style="font-size: 12px; color: #0056b3; font-weight: bold;">🌊 น้ำขึ้น-ลงรายวัน (ต.คลองขุด อ.บ้านโพธิ์):</span><br>
@@ -62,7 +66,7 @@ menu = st.sidebar.selectbox(
     ]
 )
 
-# 📌 Sidebar Footer Credit (เอาภาพออกแล้ว)
+# 📌 Sidebar Footer Credit
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     "<p style='text-align: center; color: gray; font-size: 11px;'>ออกแบบและพัฒนาโดย พ่ออินดี้</p>", 
@@ -149,7 +153,7 @@ elif "2." in menu:
         st.divider()
         st.subheader("📥 บันทึกรับเข้าอาหาร (ซื้ออาหารเข้าฟาร์ม)")
         with st.form("feed_in_form"):
-            f_date = st.date_input("วันที่ซื้อ / รับเข้า", datetime.date.today())
+            f_date = st.date_input("วันที่ซื้อ / รับเข้า", datetime.datetime.now(thai_tz).date())
             f_store = st.text_input("ร้านที่ซื้อ (เช่น ร้านสหกรณ์การเกษตร, ซีพี)")
             f_type = st.selectbox("เลือกเบอร์อาหาร", st.session_state['feed_types'])
             f_qty = st.number_input("จำนวนที่รับเข้า (กระสอบ / ถุง)", min_value=0.0, format="%.2f", value=10.0)
@@ -174,7 +178,7 @@ elif "2." in menu:
             st.info("ยังไม่มีประวัติการรับเข้าอาหาร กรุณาบันทึกรับเข้าก่อน")
         else:
             with st.form("feed_out_form"):
-                out_date = st.date_input("วันที่จ่ายออก", datetime.date.today())
+                out_date = st.date_input("วันที่จ่ายออก", datetime.datetime.now(thai_tz).date())
                 out_pond = st.selectbox("เลือกบ่อที่นำไปใช้", st.session_state['ponds_list'])
                 out_type = st.selectbox("เลือกเบอร์อาหารที่ต้องการเบิก", st.session_state['feed_types'])
                 out_qty = st.number_input("จำนวนที่จ่ายออก (กระสอบ / ถุง)", min_value=0.0, format="%.2f", value=1.0)
@@ -213,7 +217,7 @@ elif "3." in menu:
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            log_date = st.date_input("วันที่", datetime.date.today())
+            log_date = st.date_input("วันที่", datetime.datetime.now(thai_tz).date())
             doc = st.number_input("อายุการเลี้ยง (DOC)", min_value=0, value=1)
             feed_no = st.selectbox("เบอร์อาหาร", st.session_state['feed_types'])
             feed_amt = st.number_input("ปริมาณอาหารที่ให้วันนี้ (กก.)", min_value=0.0, format="%.2f")
@@ -252,7 +256,7 @@ elif "4." in menu:
     with st.form("water_form"):
         col1, col2 = st.columns(2)
         with col1:
-            w_date = st.date_input("วันที่ตรวจน้ำ", datetime.date.today())
+            w_date = st.date_input("วันที่ตรวจน้ำ", datetime.datetime.now(thai_tz).date())
             ph_val = st.number_input("ค่า pH ปัจจุบัน", value=7.8, format="%.1f")
             do_val = st.number_input("ค่าออกซิเจนละลาย DO (mg/l)", value=5.2, format="%.1f")
         with col2:
@@ -335,7 +339,7 @@ elif "6." in menu:
             with col_s2:
                 shrimp_type = st.selectbox("🦐 ชนิดกุ้ง", ["กุ้งขาวแวนนาไม", "กุ้งก้ามกราม"])
             with col_s3:
-                start_date = st.date_input("📅 วันที่ลงเลี้ยง (ปล่อยลูกกุ้ง)", datetime.date.today())
+                start_date = st.date_input("📅 วันที่ลงเลี้ยง (ปล่อยลูกกุ้ง)", datetime.datetime.now(thai_tz).date())
                 
             if shrimp_type == "กุ้งก้ามกราม":
                 days_to_grow = 180
