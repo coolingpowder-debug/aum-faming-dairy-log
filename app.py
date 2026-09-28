@@ -4,18 +4,38 @@ import datetime
 
 st.set_page_config(page_title="ระบบบันทึกข้อมูลฟาร์มกุ้ง", page_icon="🦐", layout="wide")
 
-st.title("🦐 ระบบบันทึกข้อมูลฟาร์มกุ้ง (Shrimp Farm Management)")
+# ส่วนหัวด้านบน: แสดงนาฬิกาและพยากรณ์อากาศที่มุมขวา
+top_col1, top_col2 = st.columns([3, 1])
 
-# เมนูด้านข้าง
+with top_col1:
+    st.title("🦐 ระบบบันทึกข้อมูลฟาร์มกุ้ง (Shrimp Farm Management)")
+
+with top_col2:
+    # แสดงนาฬิกาและพยากรณ์อากาศจำลอง (หรือดึงข้อมูลจริง)
+    current_time = datetime.datetime.now().strftime("%H:%M:%S")
+    st.markdown(f"""
+    <div style="text-align: right; background-color: #f0f2f6; padding: 10px; border-radius: 10px;">
+        <span style="font-size: 14px; font-weight: bold;">⏰ เวลา: {current_time}</span><br>
+        <span style="font-size: 12px; color: #555;">🌤️ พยากรณ์อากาศ (3 วันข้างหน้า):</span><br>
+        <span style="font-size: 11px; color: #333;">วันนี้: 32°C ฝนฟ้าคะนอง<br>พรุ่งนี้: 33°C แดดจัด<br>มะรืน: 31°C มีเมฆมาก</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.divider()
+
+# เมนูด้านข้างพร้อมไอคอน
 menu = st.sidebar.selectbox(
     "เลือกเมนูหลัก",
-    ["1. บันทึกรายวัน (Daily Log)", "2. บันทึกต้นทุนราย Crop"]
+    [
+        "📋 1. บันทึกรายวัน (Daily Log)", 
+        "💰 2. บันทึกต้นทุนราย Crop"
+    ]
 )
 
 # ---------------------------------------------------------
 # เมนูที่ 1: บันทึกรายวัน (Daily Log)
 # ---------------------------------------------------------
-if menu == "1. บันทึกรายวัน (Daily Log)":
+if menu == "📋 1. บันทึกรายวัน (Daily Log)":
     st.header("📋 บันทึกข้อมูลการเลี้ยงกุ้งรายวัน")
     
     with st.form("daily_log_form"):
@@ -63,7 +83,7 @@ if menu == "1. บันทึกรายวัน (Daily Log)":
 # ---------------------------------------------------------
 # เมนูที่ 2: บันทึกต้นทุนราย Crop
 # ---------------------------------------------------------
-elif menu == "2. บันทึกต้นทุนราย Crop":
+elif menu == "💰 2. บันทึกต้นทุนราย Crop":
     st.header("💰 บันทึกต้นทุนและการคำนวณกำไรประจำรอบการเลี้ยง (Crop Cost)")
     
     category = st.selectbox(
