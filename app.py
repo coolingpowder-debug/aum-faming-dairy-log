@@ -62,11 +62,10 @@ menu = st.sidebar.selectbox(
     ]
 )
 
-# 📌 Sidebar Footer Card & Credit
+# 📌 Sidebar Footer Credit (เอาภาพออกแล้ว)
 st.sidebar.markdown("---")
-st.sidebar.image("https://i.ibb.co/3yk5075/indy-card.jpg", width=250)
 st.sidebar.markdown(
-    "<p style='text-align: center; color: gray; font-size: 11px; margin-top: 5px;'>ออกแบบและพัฒนาโดย พ่ออินดี้</p>", 
+    "<p style='text-align: center; color: gray; font-size: 11px;'>ออกแบบและพัฒนาโดย พ่ออินดี้</p>", 
     unsafe_allow_html=True
 )
 
@@ -263,7 +262,6 @@ elif "4." in menu:
             
         w_submitted = st.form_submit_button(f"💾 ตรวจสอบและบันทึกค่าคุณภาพน้ำ")
         if w_submitted:
-            # Explainable Alerts Logic
             alerts = []
             if ph_val < 7.5 or ph_val > 8.5:
                 alerts.append(f"⚠️ เตือน: ค่า pH ({ph_val}) อยู่นอกช่วงที่เหมาะสม (7.5 - 8.5)")
@@ -425,7 +423,7 @@ elif "7." in menu:
 # เมนูที่ 8: สรุปผลผลิตและส่งออกรายงาน (Export & Harvest)
 # ---------------------------------------------------------
 elif "8." in menu:
-    st.header(f"📊 สรุปผลผลิต กำไรสุทธิ และส่งออกรายงาน — [ กำลังวิเคราะห์: {selected_pond} ]")
+    st.header(f"📊 สรุปผลผลิต กำไรสุทธิ และส่งออกรายงาน — [ กำลังจัดการ: {selected_pond} ]")
     
     col1, col2, col3 = st.columns(3)
     with col1:
