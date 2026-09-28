@@ -53,6 +53,13 @@ menu = st.sidebar.selectbox(
     ]
 )
 
+# 📌 เพิ่มเครดิตด้านล่าง Sidebar (ตัวหนังสือไม่ใหญ่)
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    "<p style='text-align: center; color: gray; font-size: 11px;'>ออกแบบและพัฒนาโดย พ่ออินดี้</p>", 
+    unsafe_allow_html=True
+)
+
 # ---------------------------------------------------------
 # เมนูที่ 0: แดชบอร์ดภาพรวมทุกบ่อ (Dashboard)
 # ---------------------------------------------------------
