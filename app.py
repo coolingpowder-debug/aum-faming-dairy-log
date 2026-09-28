@@ -4,8 +4,8 @@ import datetime
 
 st.set_page_config(page_title="ระบบบันทึกข้อมูลฟาร์มกุ้งหลายบ่อ", page_icon="🦐", layout="wide")
 
-# ส่วนหัวด้านบน: แสดงนาฬิกาและพยากรณ์อากาศที่มุมขวา
-top_col1, top_col2 = st.columns([3, 1])
+# ส่วนหัวด้านบน: แสดงนาฬิกา พยากรณ์อากาศ และข้อมูลน้ำขึ้นน้ำลงที่มุมขวา
+top_col1, top_col2 = st.columns([2.5, 1.5])
 
 with top_col1:
     st.title("🦐 ระบบบันทึกข้อมูลฟาร์มกุ้ง (Multi-Pond Management)")
@@ -16,7 +16,13 @@ with top_col2:
     <div style="text-align: right; background-color: #f0f2f6; padding: 10px; border-radius: 10px;">
         <span style="font-size: 14px; font-weight: bold;">⏰ เวลา: {current_time}</span><br>
         <span style="font-size: 12px; color: #555;">🌤️ พยากรณ์อากาศ (3 วัน):</span><br>
-        <span style="font-size: 11px; color: #333;">วันนี้: 32°C ฝนฟ้าคะนอง<br>พรุ่งนี้: 33°C แดดจัด<br>มะรืน: 31°C มีเมฆมาก</span>
+        <span style="font-size: 11px; color: #333;">วันนี้: 32°C ฝนฟ้าคะนอง | พรุ่งนี้: 33°C แดดจัด</span><hr style="margin: 5px 0;">
+        <span style="font-size: 12px; color: #0056b3; font-weight: bold;">🌊 น้ำขึ้นน้ำลง (ต.คลองขุด อ.บ้านโพธิ์):</span><br>
+        <span style="font-size: 11px; color: #333;">
+        • ช่วง 1-15 ค่ำ (น้ำ 🟢หนุนสูง): 05:30 น. / 18:00 น.<br>
+        • ช่วง 16-30 ค่ำ (น้ำ 🔴ลงต่ำ): 12:00 น. / 00:30 น.<br>
+        <i>(อิงตามอิทธิพลแม่น้ำบางปะกง จ.ฉะเชิงเทรา)</i>
+        </span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -187,7 +193,6 @@ elif "4." in menu:
             with col_s3:
                 start_date = st.date_input("📅 วันที่ลงเลี้ยง (ปล่อยลูกกุ้ง)", datetime.date.today())
                 
-            # คำนวณวันตามชนิดกุ้งแบบ Interactive ทันที
             if shrimp_type == "กุ้งก้ามกราม":
                 days_to_grow = 180
             else:
